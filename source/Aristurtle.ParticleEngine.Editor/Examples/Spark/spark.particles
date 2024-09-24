@@ -1,0 +1,79 @@
+{
+  "Name": "Spark Effect",
+  "Position": "960,540",
+  "Rotation": 0,
+  "Scale": "1,1",
+  "Emitters": [
+    {
+      "Name": "Spark Emitter",
+      "Capacity": 10000,
+      "LifeSpan": 2,
+      "Offset": "0,0",
+      "LayerDepth": 0,
+      "AutoTrigger": false,
+      "AutoTriggerFrequency": 0,
+      "ReclaimFrequency": 5,
+      "Parameters": {
+        "Color": {
+          "Kind": "Constant",
+          "Constant": "50,0.8,0.5"
+        },
+        "Mass": {
+          "Kind": "Random",
+          "RandomMin": 8,
+          "RandomMax": 12
+        },
+        "Opacity": {
+          "Kind": "Constant",
+          "Constant": 1
+        },
+        "Quantity": {
+          "Kind": "Constant",
+          "Constant": 10
+        },
+        "Rotation": {
+          "Kind": "Constant",
+          "Constant": 0
+        },
+        "Scale": {
+          "Kind": "Constant",
+          "Constant": 1
+        },
+        "Speed": {
+          "Kind": "Random",
+          "RandomMin": 0,
+          "RandomMax": 100
+        }
+      },
+      "ModifierExecutionStrategy": "Serial",
+      "Modifiers": [
+        {
+          "Name": "LinearGravityModifier",
+          "Frequency": 15,
+          "Type": "LinearGravityModifier",
+          "Direction": "0,1",
+          "Strength": 30
+        },
+        {
+          "Name": "RectangleContainerModifier",
+          "Frequency": 15,
+          "Type": "RectangleContainerModifier",
+          "Width": 1280,
+          "Height": 720,
+          "RestitutionCoefficient": 0.75
+        },
+        {
+          "Name": "OpacityFastFadeModifier",
+          "Frequency": 10,
+          "Type": "OpacityFastFadeModifier"
+        }
+      ],
+      "Profile": {
+        "Type": "PointProfile"
+      },
+      "TextureKey": "particle.png",
+      "SourceRectangle": null,
+      "RenderingOrder": "FrontToBack"
+    }
+  ]
+}

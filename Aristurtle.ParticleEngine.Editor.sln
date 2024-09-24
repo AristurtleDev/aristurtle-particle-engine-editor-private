@@ -1,0 +1,80 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{BA50F33E-3DE7-48AA-A858-317C7C212ECC}"
+	ProjectSection(SolutionItems) = preProject
+		source\Directory.Build.props = source\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aristurtle.ParticleEngine.Editor", "source\Aristurtle.ParticleEngine.Editor\Aristurtle.ParticleEngine.Editor.csproj", "{14C09CD4-A51A-4778-AACE-1F51525C90C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aristurtle.ParticleEngine", "Aristurtle.ParticleEngine", "{E0A9E3C3-6A5A-4283-A887-EE1B4E4674A8}"
+	ProjectSection(SolutionItems) = preProject
+		source\Aristurtle.ParticleEngine\.editorconfig = source\Aristurtle.ParticleEngine\.editorconfig
+		source\Aristurtle.ParticleEngine\.gitattributes = source\Aristurtle.ParticleEngine\.gitattributes
+		source\Aristurtle.ParticleEngine\.gitignore = source\Aristurtle.ParticleEngine\.gitignore
+		source\Aristurtle.ParticleEngine\Directory.Build.props = source\Aristurtle.ParticleEngine\Directory.Build.props
+		source\Aristurtle.ParticleEngine\LICENSE = source\Aristurtle.ParticleEngine\LICENSE
+		source\Aristurtle.ParticleEngine\README.md = source\Aristurtle.ParticleEngine\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{05F09B76-FF80-413F-8EAD-DC50779E4A5D}"
+	ProjectSection(SolutionItems) = preProject
+		source\Aristurtle.ParticleEngine\source\Directory.Build.props = source\Aristurtle.ParticleEngine\source\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aristurtle.ParticleEngine", "source\Aristurtle.ParticleEngine\source\Aristurtle.ParticleEngine\Aristurtle.ParticleEngine.csproj", "{F84D9FE1-C903-4F32-9DA2-A44AC6E0A25B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{482ED3BC-4195-4E72-9BB1-5305D7AA1BC9}"
+	ProjectSection(SolutionItems) = preProject
+		source\Aristurtle.ParticleEngine\tests\Directory.Build.props = source\Aristurtle.ParticleEngine\tests\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aristurtle.ParticleEngine.Tests", "source\Aristurtle.ParticleEngine\tests\Aristurtle.ParticleEngine.Tests\Aristurtle.ParticleEngine.Tests.csproj", "{5CF5BD21-4C69-46CF-8945-FB8F9566ABE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_root", "_root", "{DFF6B37D-EDF4-4B80-BB8A-58CCA30F218B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14C09CD4-A51A-4778-AACE-1F51525C90C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14C09CD4-A51A-4778-AACE-1F51525C90C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14C09CD4-A51A-4778-AACE-1F51525C90C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14C09CD4-A51A-4778-AACE-1F51525C90C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F84D9FE1-C903-4F32-9DA2-A44AC6E0A25B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F84D9FE1-C903-4F32-9DA2-A44AC6E0A25B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F84D9FE1-C903-4F32-9DA2-A44AC6E0A25B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F84D9FE1-C903-4F32-9DA2-A44AC6E0A25B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CF5BD21-4C69-46CF-8945-FB8F9566ABE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CF5BD21-4C69-46CF-8945-FB8F9566ABE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CF5BD21-4C69-46CF-8945-FB8F9566ABE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CF5BD21-4C69-46CF-8945-FB8F9566ABE9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{14C09CD4-A51A-4778-AACE-1F51525C90C8} = {BA50F33E-3DE7-48AA-A858-317C7C212ECC}
+		{E0A9E3C3-6A5A-4283-A887-EE1B4E4674A8} = {BA50F33E-3DE7-48AA-A858-317C7C212ECC}
+		{05F09B76-FF80-413F-8EAD-DC50779E4A5D} = {E0A9E3C3-6A5A-4283-A887-EE1B4E4674A8}
+		{F84D9FE1-C903-4F32-9DA2-A44AC6E0A25B} = {05F09B76-FF80-413F-8EAD-DC50779E4A5D}
+		{482ED3BC-4195-4E72-9BB1-5305D7AA1BC9} = {E0A9E3C3-6A5A-4283-A887-EE1B4E4674A8}
+		{5CF5BD21-4C69-46CF-8945-FB8F9566ABE9} = {482ED3BC-4195-4E72-9BB1-5305D7AA1BC9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2DABA595-8A68-4BD1-88CB-F05470B6BB0C}
+	EndGlobalSection
+EndGlobal

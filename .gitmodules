@@ -1,0 +1,3 @@
+[submodule "source/Aristurtle.ParticleEngine"]
+	path = source/Aristurtle.ParticleEngine
+	url = https://github.com/aristurtledev/aristurtle-particle-engine
