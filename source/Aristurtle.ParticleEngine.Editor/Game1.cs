@@ -71,14 +71,14 @@ namespace Aristurtle.ParticleEngine.Editor
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
             _graphics.DeviceCreated += OnGraphicsDeviceCreated;
             _graphics.DeviceReset += OnGraphicsDeviceReset;
             _graphics.ApplyChanges();
 
 
-            Window.AllowUserResizing = true;
+            Window.AllowUserResizing = false;
             Window.ClientSizeChanged += OnClientSizeChanged;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -328,7 +328,8 @@ namespace Aristurtle.ParticleEngine.Editor
             Vec2 buttonSize = Vec2.Zero;
             Vec2 listBoxSize = Vec2.Zero;
 
-            ImGui.SetNextWindowPos(Vec2.Zero, ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowPos(new Vec2(0, _mainMenuBarSize.Y), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vec2(600, 1056), ImGuiCond.FirstUseEver);
             ImGui.Begin("Particle Emitters");
 
             #region Emitter List
@@ -907,7 +908,9 @@ namespace Aristurtle.ParticleEngine.Editor
 
         private void DrawEmitterModifiers(ImGuiStylePtr style, ImGuiIOPtr io)
         {
-            ImGui.SetNextWindowPos(new Vec2(200, 0), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowPos(new Vec2(1500, _mainMenuBarSize.Y), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vec2(420, 1056), ImGuiCond.FirstUseEver);
+
             ImGui.Begin("Modifiers");
 
             if (_emitter is null)

@@ -19,7 +19,7 @@ public static class Fonts
     {
         string path = Path.Combine(".", "Content", FONT_NAME + ".ttf");
         ImFontAtlasPtr fonts = ImGui.GetIO().Fonts;
-        NormalFont = fonts.AddFontFromFileTTF(path, 16);
+        NormalFont = fonts.AddFontFromFileTTF(path, 18);
         TitleFont = fonts.AddFontFromFileTTF(path, 24);
         HeadingFont = fonts.AddFontFromFileTTF(path, 20);
         SubheadingFont = fonts.AddFontFromFileTTF(path, 18);
