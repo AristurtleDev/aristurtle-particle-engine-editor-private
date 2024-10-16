@@ -3,6 +3,7 @@
 // See LICENSE file in the project root for full license information.
 
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Aristurtle.ParticleEngine.Data;
 using Aristurtle.ParticleEngine.Editor.Factories;
@@ -23,6 +24,8 @@ namespace Aristurtle.ParticleEngine.Editor
 {
     public class Game1 : Game
     {
+        public new static GraphicsDevice GraphicsDevice;
+
         private const string WINDOW_TITLE = "Turtle Particle Engine: Editor {0} | {1:F3} ms/Frame | {2:F1} FPS";
         private const string VERSION = "0.0.1";
 
@@ -42,7 +45,7 @@ namespace Aristurtle.ParticleEngine.Editor
         private Modifier _modifier;
         private List<Interpolator> _interpolators;
         private Interpolator _interpolator;
-        private readonly ParticleEffectRenderer _particleRenderer;
+        private readonly ParticleEffectRendererNonStatic _particleRenderer;
         private readonly string[] _particleValueKindNames;
         private readonly string[] _circleRadiationNames;
         private readonly string[] _renderingOrderNames;
@@ -55,7 +58,7 @@ namespace Aristurtle.ParticleEngine.Editor
         //-------------------------------------------------------------------------------------------------------------
         //  Layout
         //-------------------------------------------------------------------------------------------------------------
-        private Vec2 _mainMenuBarSize;
+        private SysVec2 _mainMenuBarSize;
         private Rectangle _particleEffectWindowRect;
         private Rectangle _modifiersWindowRect;
 
@@ -86,7 +89,7 @@ namespace Aristurtle.ParticleEngine.Editor
             _particleValueKindNames = Enum.GetNames(typeof(ParticleValueKind));
             _circleRadiationNames = Enum.GetNames(typeof(CircleRadiation));
             _renderingOrderNames = Enum.GetNames(typeof(ParticleRenderingOrder));
-            _particleRenderer = new ParticleEffectRenderer();
+            _particleRenderer = new ParticleEffectRendererNonStatic();
         }
 
         private void OnGraphicsDeviceReset(object sender, EventArgs e)
@@ -122,6 +125,7 @@ namespace Aristurtle.ParticleEngine.Editor
         protected override void Initialize()
         {
             base.Initialize();
+            GraphicsDevice = base.GraphicsDevice;
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -165,8 +169,8 @@ namespace Aristurtle.ParticleEngine.Editor
             {
                 if (!_particleEffectWindowRect.Contains(_currentMouse.Position) && !_modifiersWindowRect.Contains(_currentMouse.Position))
                 {
-                    Vec2 point1 = new Vec2(_previousMouse.Position.X, _previousMouse.Position.Y);
-                    Vec2 point2 = new Vec2(_currentMouse.Position.X, _currentMouse.Position.Y);
+                    SysVec2 point1 = new SysVec2(_previousMouse.Position.X, _previousMouse.Position.Y);
+                    SysVec2 point2 = new SysVec2(_currentMouse.Position.X, _currentMouse.Position.Y);
                     LineSegment line = new LineSegment(point1, point2);
                     _particleEffect.Trigger(line, 0.0f);
 
@@ -207,15 +211,17 @@ namespace Aristurtle.ParticleEngine.Editor
             style = ImGui.GetStyle();
             io = ImGui.GetIO();
 
-            DrawMainMenuBar(style, io);
+            MainMenuWindow.Draw();
 
-            if (_particleEffect is null)
+            if (Project.ParticleEffect is null)
             {
-                DrawStartWindow(style, io);
+                StartWindow.Draw();
+                //DrawStartWindow(style, io);
             }
             else
             {
-                DrawDockSpace(style, io);
+                DockSpaceWindow.Draw();
+                //DrawDockSpace(style, io);
                 DrawEmitterList(style, io);
                 DrawEmitterModifiers(style, io);
             }
@@ -232,37 +238,37 @@ namespace Aristurtle.ParticleEngine.Editor
 
         #region ImGui Windows
 
-        private void DrawDockSpace(ImGuiStylePtr style, ImGuiIOPtr io)
-        {
-            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoCollapse;
-            windowFlags |= ImGuiWindowFlags.NoResize;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus;
-            windowFlags |= ImGuiWindowFlags.NoNavFocus;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
+        //private void DrawDockSpace(ImGuiStylePtr style, ImGuiIOPtr io)
+        //{
+        //    ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None;
+        //    windowFlags |= ImGuiWindowFlags.NoTitleBar;
+        //    windowFlags |= ImGuiWindowFlags.NoCollapse;
+        //    windowFlags |= ImGuiWindowFlags.NoResize;
+        //    windowFlags |= ImGuiWindowFlags.NoMove;
+        //    windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus;
+        //    windowFlags |= ImGuiWindowFlags.NoNavFocus;
+        //    windowFlags |= ImGuiWindowFlags.NoBackground;
 
-            Vec2 windowPos = Vec2.Zero;
-            windowPos.Y = _mainMenuBarSize.Y;
+        //    SysVec2 windowPos = SysVec2.Zero;
+        //    windowPos.Y = _mainMenuBarSize.Y;
 
-            Vec2 windowSize = io.DisplaySize;
-            windowSize.Y -= _mainMenuBarSize.Y;
+        //    SysVec2 windowSize = io.DisplaySize;
+        //    windowSize.Y -= _mainMenuBarSize.Y;
 
-            ImGui.SetNextWindowPos(windowPos);
-            ImGui.SetNextWindowSize(windowSize);
-            ImGui.Begin("DockSpace", windowFlags);
+        //    ImGui.SetNextWindowPos(windowPos);
+        //    ImGui.SetNextWindowSize(windowSize);
+        //    ImGui.Begin("DockSpace", windowFlags);
 
-            ImGuiDockNodeFlags dockNodeFlags = ImGuiDockNodeFlags.None;
-            dockNodeFlags |= ImGuiDockNodeFlags.PassthruCentralNode;
-            dockNodeFlags |= ImGuiDockNodeFlags.NoDockingOverCentralNode;
+        //    ImGuiDockNodeFlags dockNodeFlags = ImGuiDockNodeFlags.None;
+        //    dockNodeFlags |= ImGuiDockNodeFlags.PassthruCentralNode;
+        //    dockNodeFlags |= ImGuiDockNodeFlags.NoDockingOverCentralNode;
 
-            uint id = ImGui.GetID("DockSpace");
-            ImGui.DockSpace(id, Vec2.Zero, dockNodeFlags);
+        //    uint id = ImGui.GetID("DockSpace");
+        //    ImGui.DockSpace(id, SysVec2.Zero, dockNodeFlags);
 
-            ImGui.End();
+        //    ImGui.End();
 
-        }
+        //}
 
         private void DrawMainMenuBar(ImGuiStylePtr style, ImGuiIOPtr io)
         {
@@ -284,52 +290,52 @@ namespace Aristurtle.ParticleEngine.Editor
             }
         }
 
-        private unsafe void DrawStartWindow(ImGuiStylePtr style, ImGuiIOPtr io)
-        {
-            Vec2 windowPos = Vec2.Zero;
-            windowPos.Y += _mainMenuBarSize.Y;
+        //private unsafe void DrawStartWindow(ImGuiStylePtr style, ImGuiIOPtr io)
+        //{
+        //    SysVec2 windowPos = SysVec2.Zero;
+        //    windowPos.Y += _mainMenuBarSize.Y;
 
-            Vec2 windowSize = io.DisplaySize;
-            windowSize.Y -= _mainMenuBarSize.Y;
+        //    SysVec2 windowSize = io.DisplaySize;
+        //    windowSize.Y -= _mainMenuBarSize.Y;
 
-            ImGui.SetNextWindowPos(windowPos);
-            ImGui.SetNextWindowSize(windowSize);
+        //    ImGui.SetNextWindowPos(windowPos);
+        //    ImGui.SetNextWindowSize(windowSize);
 
-            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None;
-            windowFlags |= ImGuiWindowFlags.NoCollapse;
-            windowFlags |= ImGuiWindowFlags.NoResize;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoScrollbar;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
+        //    ImGuiWindowFlags windowFlags = ImGuiWindowFlags.None;
+        //    windowFlags |= ImGuiWindowFlags.NoCollapse;
+        //    windowFlags |= ImGuiWindowFlags.NoResize;
+        //    windowFlags |= ImGuiWindowFlags.NoMove;
+        //    windowFlags |= ImGuiWindowFlags.NoScrollbar;
+        //    windowFlags |= ImGuiWindowFlags.NoTitleBar;
 
-            ImGui.Begin("##StartWindow", windowFlags);
-            ImGui.PushFont(Fonts.TitleFont);
-            ImGui.Text("Turtle Particle Engine");
-            ImGui.PopFont();
+        //    ImGui.Begin("##StartWindow", windowFlags);
+        //    ImGui.PushFont(Fonts.TitleFont);
+        //    ImGui.Text("Turtle Particle Engine");
+        //    ImGui.PopFont();
 
 
-            Vec2 buttonSize = new Vec2(400, 100);
-            Vec2 topLeft;
-            topLeft.X = io.DisplaySize.X * 0.5f - buttonSize.X * 0.5f;
-            topLeft.Y = io.DisplaySize.Y * 0.5f - (buttonSize.Y * 2 + style.ItemSpacing.Y) * 0.5f;
-            ImGui.PushFont(Fonts.HeadingFont);
-            ImGui.SetCursorPos(topLeft);
-            if (ImGui.Button("Create New Project##Button", buttonSize)) { CreateNewProject(); }
-            ImGui.SetCursorPosX(topLeft.X);
-            if (ImGui.Button("Open Existing Project##Button", buttonSize)) { OpenExistingProject(); }
-            ImGui.PopFont();
+        //    SysVec2 buttonSize = new SysVec2(400, 100);
+        //    SysVec2 topLeft;
+        //    topLeft.X = io.DisplaySize.X * 0.5f - buttonSize.X * 0.5f;
+        //    topLeft.Y = io.DisplaySize.Y * 0.5f - (buttonSize.Y * 2 + style.ItemSpacing.Y) * 0.5f;
+        //    ImGui.PushFont(Fonts.HeadingFont);
+        //    ImGui.SetCursorPos(topLeft);
+        //    if (ImGui.Button("Create New Project##Button", buttonSize)) { CreateNewProject(); }
+        //    ImGui.SetCursorPosX(topLeft.X);
+        //    if (ImGui.Button("Open Existing Project##Button", buttonSize)) { OpenExistingProject(); }
+        //    ImGui.PopFont();
 
-            ImGui.End();
-        }
+        //    ImGui.End();
+        //}
 
         private unsafe void DrawEmitterList(ImGuiStylePtr style, ImGuiIOPtr io)
         {
-            Vec2 contentSize = Vec2.Zero;
-            Vec2 buttonSize = Vec2.Zero;
-            Vec2 listBoxSize = Vec2.Zero;
+            SysVec2 contentSize = SysVec2.Zero;
+            SysVec2 buttonSize = SysVec2.Zero;
+            SysVec2 listBoxSize = SysVec2.Zero;
 
-            ImGui.SetNextWindowPos(new Vec2(0, _mainMenuBarSize.Y), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(new Vec2(600, 1056), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowPos(new SysVec2(0, _mainMenuBarSize.Y), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new SysVec2(600, 1056), ImGuiCond.FirstUseEver);
             ImGui.Begin("Particle Emitters");
 
             #region Emitter List
@@ -532,7 +538,7 @@ namespace Aristurtle.ParticleEngine.Editor
                 }
                 else
                 {
-                    Vec2 range = new Vec2(speed.RandomMin, speed.RandomMax);
+                    SysVec2 range = new SysVec2(speed.RandomMin, speed.RandomMax);
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     if (ImGui.InputFloat2("##SpeedRandom", ref range, null, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -562,11 +568,11 @@ namespace Aristurtle.ParticleEngine.Editor
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     var (r, g, b) = ColorUtilities.HslToRgb(color.Constant);
-                    Vec3 rgb = new Vec3(r, g, b) / 255.0f;
+                    SysVec3 rgb = new SysVec3(r, g, b) / 255.0f;
                     if (ImGui.ColorEdit3($"##ColorStatic", ref rgb, ImGuiColorEditFlags.InputRGB))
                     {
                         var (h, s, l) = ColorUtilities.RgbToHsl(rgb);
-                        color.Constant = new Vec3(h, s, l);
+                        color.Constant = new SysVec3(h, s, l);
                     }
                     OutlinePreviousItemIfActive();
                 }
@@ -575,11 +581,11 @@ namespace Aristurtle.ParticleEngine.Editor
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     var (rMin, gMin, bMin) = ColorUtilities.HslToRgb(color.RandomMin);
-                    Vec3 colorMin = new Vec3(rMin, gMin, bMin) / 255.0f;
+                    SysVec3 colorMin = new SysVec3(rMin, gMin, bMin) / 255.0f;
                     if (ImGui.ColorEdit3($"##ColorRandomMin", ref colorMin, ImGuiColorEditFlags.InputRGB))
                     {
                         var (hMin, sMin, lMin) = ColorUtilities.RgbToHsl(colorMin);
-                        color.RandomMin = new Vec3(hMin, sMin, lMin);
+                        color.RandomMin = new SysVec3(hMin, sMin, lMin);
                     }
                     OutlinePreviousItemIfActive();
 
@@ -589,11 +595,11 @@ namespace Aristurtle.ParticleEngine.Editor
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     var (rMax, gMax, bMax) = ColorUtilities.HslToRgb(color.RandomMax);
-                    Vec3 colorMax = new Vec3(rMax, gMax, bMax) / 255.0f;
+                    SysVec3 colorMax = new SysVec3(rMax, gMax, bMax) / 255.0f;
                     if (ImGui.ColorEdit3($"##ColorRandomMax", ref colorMax, ImGuiColorEditFlags.InputRGB))
                     {
                         var (hMax, sMax, lMax) = ColorUtilities.RgbToHsl(colorMax);
-                        color.RandomMax = new Vec3(hMax, sMax, lMax);
+                        color.RandomMax = new SysVec3(hMax, sMax, lMax);
                     }
                 }
 
@@ -619,7 +625,7 @@ namespace Aristurtle.ParticleEngine.Editor
                 }
                 else
                 {
-                    Vec2 range = new Vec2(opacity.RandomMin, opacity.RandomMax);
+                    SysVec2 range = new SysVec2(opacity.RandomMin, opacity.RandomMax);
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     if (ImGui.InputFloat2("##OpacityRandom", ref range, null, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -651,7 +657,7 @@ namespace Aristurtle.ParticleEngine.Editor
                 }
                 else
                 {
-                    Vec2 range = new Vec2(scale.RandomMin, scale.RandomMax);
+                    SysVec2 range = new SysVec2(scale.RandomMin, scale.RandomMax);
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     if (ImGui.InputFloat2("##ScaleRandom", ref range, null, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -683,7 +689,7 @@ namespace Aristurtle.ParticleEngine.Editor
                 }
                 else
                 {
-                    Vec2 range = new Vec2(rotation.RandomMin, rotation.RandomMax);
+                    SysVec2 range = new SysVec2(rotation.RandomMin, rotation.RandomMax);
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     if (ImGui.InputFloat2("##RotationRandom", ref range, null, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -715,7 +721,7 @@ namespace Aristurtle.ParticleEngine.Editor
                 }
                 else
                 {
-                    Vec2 range = new Vec2(mass.RandomMin, mass.RandomMax);
+                    SysVec2 range = new SysVec2(mass.RandomMin, mass.RandomMax);
                     ImGui.TableNextColumn();
                     ImGui.SetNextItemWidth(-1);
                     if (ImGui.InputFloat2("##MassRandom", ref range, null, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -899,8 +905,8 @@ namespace Aristurtle.ParticleEngine.Editor
                 #endregion Emitter Profile
             }
 
-            Vec2 windowSize = ImGui.GetWindowSize();
-            Vec2 windowPos = ImGui.GetWindowPos();
+            SysVec2 windowSize = ImGui.GetWindowSize();
+            SysVec2 windowPos = ImGui.GetWindowPos();
             _particleEffectWindowRect = new Rectangle((int)windowPos.X, (int)windowPos.Y, (int)windowSize.X, (int)windowSize.Y);
 
             ImGui.End();
@@ -908,8 +914,8 @@ namespace Aristurtle.ParticleEngine.Editor
 
         private void DrawEmitterModifiers(ImGuiStylePtr style, ImGuiIOPtr io)
         {
-            ImGui.SetNextWindowPos(new Vec2(1500, _mainMenuBarSize.Y), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(new Vec2(420, 1056), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowPos(new SysVec2(1500, _mainMenuBarSize.Y), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new SysVec2(420, 1056), ImGuiCond.FirstUseEver);
 
             ImGui.Begin("Modifiers");
 
@@ -921,8 +927,8 @@ namespace Aristurtle.ParticleEngine.Editor
             {
                 #region Modifier List
 
-                Vec2 contentSize = Vec2.Zero;
-                Vec2 buttonSize = Vec2.Zero;
+                SysVec2 contentSize = SysVec2.Zero;
+                SysVec2 buttonSize = SysVec2.Zero;
 
                 contentSize = ImGui.GetContentRegionAvail();
                 buttonSize.X = contentSize.X * 0.5f - style.ItemSpacing.X * 0.5f;
@@ -934,7 +940,7 @@ namespace Aristurtle.ParticleEngine.Editor
                 ImGui.BeginDisabled(_emitter.Modifiers.Count == 0);
                 if (ImGui.Button("Remove Modifier", buttonSize)) { RemoveSelectedModifier(); }
                 ImGui.EndDisabled();
-                Vec2 listBoxSize = ImGui.GetContentRegionAvail();
+                SysVec2 listBoxSize = ImGui.GetContentRegionAvail();
                 listBoxSize.Y = ImGui.CalcTextSize("Y").Y * 5 + style.ItemSpacing.Y * 5;
                 ImGui.BeginDisabled(_emitter.Modifiers.Count == 0);
                 if (ImGui.BeginListBox("##Particle Modifier ListBox", listBoxSize))
@@ -971,8 +977,8 @@ namespace Aristurtle.ParticleEngine.Editor
                         }
                     }
 
-                    Vec2 size = ImGui.GetWindowSize();
-                    Vec2 pos = ImGui.GetMainViewport().GetCenter() - size * 0.5f;
+                    SysVec2 size = ImGui.GetWindowSize();
+                    SysVec2 pos = ImGui.GetMainViewport().GetCenter() - size * 0.5f;
                     ImGui.SetWindowPos(pos);
                     ImGui.EndPopup();
                 }
@@ -1224,7 +1230,7 @@ namespace Aristurtle.ParticleEngine.Editor
                         #region Interpolator List
 
                         contentSize = ImGui.GetContentRegionAvail();
-                        buttonSize = Vec2.Zero;
+                        buttonSize = SysVec2.Zero;
                         buttonSize.X = contentSize.X * 0.5f - style.ItemSpacing.X * 0.5f;
 
                         if (ImGui.Button("Add Interpolator", buttonSize))
@@ -1273,8 +1279,8 @@ namespace Aristurtle.ParticleEngine.Editor
                                 }
                             }
 
-                            Vec2 size = ImGui.GetWindowSize();
-                            Vec2 pos = ImGui.GetMainViewport().GetCenter() - size * 0.5f;
+                            SysVec2 size = ImGui.GetWindowSize();
+                            SysVec2 pos = ImGui.GetMainViewport().GetCenter() - size * 0.5f;
                             ImGui.SetWindowPos(pos);
                             ImGui.EndPopup();
                         }
@@ -1423,8 +1429,8 @@ namespace Aristurtle.ParticleEngine.Editor
                 }
             }
 
-            Vec2 windowSize = ImGui.GetWindowSize();
-            Vec2 windowPos = ImGui.GetWindowPos();
+            SysVec2 windowSize = ImGui.GetWindowSize();
+            SysVec2 windowPos = ImGui.GetWindowPos();
             _modifiersWindowRect = new Rectangle((int)windowPos.X, (int)windowPos.Y, (int)windowSize.X, (int)windowSize.Y);
             ImGui.End();
         }
@@ -1658,9 +1664,9 @@ namespace Aristurtle.ParticleEngine.Editor
         {
             if (ImGui.IsItemActive())
             {
-                Vec2 min = ImGui.GetItemRectMin();
-                Vec2 max = ImGui.GetItemRectMax();
-                uint col = ImGui.GetColorU32(new Vec4(1, 1, 1, 1));
+                SysVec2 min = ImGui.GetItemRectMin();
+                SysVec2 max = ImGui.GetItemRectMax();
+                uint col = ImGui.GetColorU32(new SysVec4(1, 1, 1, 1));
                 ImDrawFlags flags = ImDrawFlags.None;
                 ImGui.GetWindowDrawList().AddRect(min, max, col, 0.0f, flags, 1.0f);
             }

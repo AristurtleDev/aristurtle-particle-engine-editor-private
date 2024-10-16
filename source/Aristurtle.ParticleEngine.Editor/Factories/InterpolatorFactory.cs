@@ -34,7 +34,7 @@ public static class InterpolatorFactory
         };
     }
 
-    private static ColorInterpolator ColorInterpolator() => new ColorInterpolator() { StartValue = new Vec3(0.0f, 0.0f, 0.0f), EndValue = new Vec3(0.0f, 0.0f, 1.0f) };
+    private static ColorInterpolator ColorInterpolator() => new ColorInterpolator() { StartValue = new SysVec3(0.0f, 0.0f, 0.0f), EndValue = new SysVec3(0.0f, 0.0f, 1.0f) };
     private static HueInterpolator HueInterpolator() => new HueInterpolator() { StartValue = 0.0f, EndValue = 1.0f };
     private static OpacityInterpolator OpacityInterpolator() => new OpacityInterpolator() { StartValue = 0.0f, EndValue = 1.0f };
     private static RotationInterpolator RotationInterpolator() => new RotationInterpolator() { StartValue = 0.0f, EndValue = MathF.PI / 2.0f };

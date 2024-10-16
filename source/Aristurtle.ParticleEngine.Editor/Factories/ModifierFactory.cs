@@ -44,13 +44,13 @@ public static class ModifierFactory
 
     private static RectangleLoopContainerModifier RectangleLoopContainerModifier() => new RectangleLoopContainerModifier() { Width = 100, Height = 100 };
     private static RectangleContainerModifier RectangleContainerModifier() => new RectangleContainerModifier { Width = 100, Height = 100 };
-    private static LinearGravityModifier LinearGravityModifier() => new LinearGravityModifier() { Direction = Vec2.UnitY, Strength = 100.0f };
-    private static VortexModifier VortexModifier() => new VortexModifier() { Mass = 100.0f, Position = new Vec2(100.0f, 100.0f), MaxSpeed = 100.0f };
+    private static LinearGravityModifier LinearGravityModifier() => new LinearGravityModifier() { Direction = SysVec2.UnitY, Strength = 100.0f };
+    private static VortexModifier VortexModifier() => new VortexModifier() { Mass = 100.0f, Position = new SysVec2(100.0f, 100.0f), MaxSpeed = 100.0f };
     private static OpacityFastFadeModifier OpacityFastFadeModifier() => new OpacityFastFadeModifier();
     private static AgeModifier AgeModifier() => new AgeModifier() { Interpolators = new List<Interpolator>() { new ScaleInterpolator() { StartValue = 0.0f, EndValue = 1.0f } } };
     private static CircleContainerModifier CircleContainerModifier() => new CircleContainerModifier() { Radius = 100.0f };
     private static DragModifier DragModifier() => new DragModifier();
     private static RotationModifier RotationModifier() => new RotationModifier() { RotationRate = MathF.PI / 4.0f };
-    private static VelocityColorModifier VelocityColorModifier() => new VelocityColorModifier() { VelocityThreshold = 100.0f, StationaryColor = new Vec3(0, 0, 1.0f), VelocityColor = new Vec3(0, 1.0f, 0.5f) };
+    private static VelocityColorModifier VelocityColorModifier() => new VelocityColorModifier() { VelocityThreshold = 100.0f, StationaryColor = new SysVec3(0, 0, 1.0f), VelocityColor = new SysVec3(0, 1.0f, 0.5f) };
     private static VelocityModifier VelocityModifier() => new VelocityModifier() { VelocityThreshold = 100.0f, Interpolators = new List<Interpolator>() { new ScaleInterpolator() { StartValue = 0.0f, EndValue = 1.0f } } };
 }

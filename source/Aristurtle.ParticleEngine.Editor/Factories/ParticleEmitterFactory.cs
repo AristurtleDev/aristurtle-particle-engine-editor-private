@@ -18,9 +18,9 @@ public static class ParticleEmitterFactory
 
         emitter.Parameters.Color = new ParticleColorParameter()
         {
-            Constant = new Vec3(0.0f, 0.0f, 1.0f),
-            RandomMin = new Vec3(0.0f, 0.0f, 0.0f),
-            RandomMax = new Vec3(0.0f, 0.0f, 1.0f),
+            Constant = new SysVec3(0.0f, 0.0f, 1.0f),
+            RandomMin = new SysVec3(0.0f, 0.0f, 0.0f),
+            RandomMax = new SysVec3(0.0f, 0.0f, 1.0f),
             Kind = ParticleValueKind.Constant
         };
 

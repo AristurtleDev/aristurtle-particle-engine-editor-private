@@ -2,6 +2,7 @@
 // See LICENSE file in the project root for full license information.
 // License information can also be found at https://unlicense.org/.
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Aristurtle.ParticleEngine.Data;
 using Microsoft.Xna.Framework;
@@ -9,61 +10,60 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Aristurtle.ParticleEngine.Editor.Graphics;
 
-public sealed class ParticleEffectRenderer : IDisposable
+public static class ParticleEffectRenderer
 {
-    public Dictionary<string, Texture2D> Textures;
-    public bool IsDisposed { get; private set; }
+    public static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+    private static XnaRect _rect = XnaRect.Empty;
 
-    public ParticleEffectRenderer()
+    public static void Unload()
     {
-        Textures = new Dictionary<string, Texture2D>();
+        foreach(Texture2D texture in Textures.Values)
+        {
+            texture.Dispose();
+        }
+
+        Textures.Clear();
     }
 
-    ~ParticleEffectRenderer() => Dispose(false);
-
-    public void Draw(SpriteBatch spriteBatch, ParticleEffect particleEffect)
+    public static void Draw(SpriteBatch spriteBatch, ParticleEffect particleEffect)
     {
-        ArgumentNullException.ThrowIfNull(particleEffect);
-        ObjectDisposedException.ThrowIf(particleEffect.IsDisposed, particleEffect);
+        Debug.Assert(particleEffect is not null);
+        Debug.Assert(particleEffect.IsDisposed is false);
 
         ReadOnlySpan<ParticleEmitter> emitters = CollectionsMarshal.AsSpan(particleEffect.Emitters);
-        for (int i = 0; i < emitters.Length; i++)
+        for(int i = 0; i < emitters.Length; i++)
         {
             Draw(spriteBatch, emitters[i]);
         }
     }
 
-    public void Draw(SpriteBatch spriteBatch, ParticleEmitter emitter)
+    public static void Draw(SpriteBatch spriteBatch, ParticleEmitter emitter)
     {
-        ArgumentNullException.ThrowIfNull(emitter);
+        Debug.Assert(emitter is not null);
+        Debug.Assert(emitter.IsDisposed is false);
         UnsafeDraw(spriteBatch, emitter);
     }
 
-    private unsafe void UnsafeDraw(SpriteBatch spriteBatch, ParticleEmitter emitter)
+    private static unsafe void UnsafeDraw(SpriteBatch spriteBatch, ParticleEmitter emitter)
     {
-        ArgumentNullException.ThrowIfNull(spriteBatch);
+        Debug.Assert(spriteBatch is not null);
 
-        if (string.IsNullOrEmpty(emitter.TextureKey))
+        if (string.IsNullOrEmpty(emitter.TextureKey)) { return; }
+
+        if(!Textures.TryGetValue(emitter.TextureKey, out Texture2D texture))
         {
-            return;
+            Debug.Fail($"{nameof(ParticleEffectRenderer)} does not contain a texture named '{emitter.TextureKey}'.  Did you forget to add it?");
         }
 
-        if (!Textures.TryGetValue(emitter.TextureKey, out Texture2D texture))
-        {
-            throw new InvalidOperationException($"{nameof(ParticleEffectRenderer)} does not contain a texture named '{emitter.TextureKey}'.  Did you forget to add it?");
-        }
+        _rect.X = emitter.SourceRectangle?.X ?? texture.Bounds.X;
+        _rect.Y = emitter.SourceRectangle?.Y ?? texture.Bounds.Y;
+        _rect.Width = emitter.SourceRectangle?.Width ?? texture.Width;
+        _rect.Height = emitter.SourceRectangle?.Height ?? texture.Height;
 
-        Rectangle sourceRect;
-        sourceRect.X = emitter.SourceRectangle?.X ?? texture.Bounds.X;
-        sourceRect.Y = emitter.SourceRectangle?.Y ?? texture.Bounds.Y;
-        sourceRect.Width = emitter.SourceRectangle?.Width ?? texture.Bounds.Width;
-        sourceRect.Height = emitter.SourceRectangle?.Height ?? texture.Bounds.Height;
-
-        Vector2 origin = sourceRect.Center.ToVector2();
+        XnaVec2 origin = _rect.Center.ToVector2();
         int count = emitter.ActiveParticles;
 
         IntPtr buffer = Marshal.AllocHGlobal(emitter.Buffer.ActiveSizeInBytes);
-
 
         try
         {
@@ -78,12 +78,12 @@ public sealed class ParticleEffectRenderer : IDisposable
 
             Particle* particle = (Particle*)buffer;
 
-            while (count-- > 0)
+            while(count-- > 0)
             {
                 var (r, g, b) = ColorUtilities.HslToRgb(particle->Color);
-                Color color = new Color(r, g, b);
+                XnaColor color = new XnaColor(r, g, b);
 
-                if (spriteBatch.GraphicsDevice.BlendState == BlendState.AlphaBlend)
+                if(spriteBatch.GraphicsDevice.BlendState == BlendState.AlphaBlend)
                 {
                     color *= particle->Opacity;
                 }
@@ -92,13 +92,13 @@ public sealed class ParticleEffectRenderer : IDisposable
                     color.A = (byte)(particle->Opacity * 255);
                 }
 
-                Vector2 position = new Vector2(particle->Position[0], particle->Position[1]);
-                Vector2 scale = new Vector2(particle->Scale);
+                XnaVec2 position = new XnaVec2(particle->Position[0], particle->Position[1]);
+                XnaVec2 scale = new XnaVec2(particle->Scale);
                 color.A = (byte)MathHelper.Clamp(particle->Opacity * 255, 0, 255);
                 float rotation = particle->Rotation;
                 float layerDepth = particle->LayerDepth;
 
-                spriteBatch.Draw(texture, position, sourceRect, color, rotation, origin, scale, SpriteEffects.None, layerDepth);
+                spriteBatch.Draw(texture, position, _rect, color, rotation, origin, scale, SpriteEffects.None, layerDepth);
 
                 particle++;
             }
@@ -107,26 +107,6 @@ public sealed class ParticleEffectRenderer : IDisposable
         {
             Marshal.FreeHGlobal(buffer);
         }
-    }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (IsDisposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            Textures.Clear();
-        }
-
-        IsDisposed = true;
     }
 }

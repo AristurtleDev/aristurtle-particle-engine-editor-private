@@ -43,7 +43,7 @@ public static class ParticleProfileFactory
     private static BoxProfile BoxProfile() => new BoxProfile() { Width = 100.0f, Height = 100.0f };
     private static BoxFillProfile BoxFillProfile() => new BoxFillProfile() { Width = 100.0f, Height = 100.0f };
     private static BoxUniformProfile BoxUniformProfile() => new BoxUniformProfile() { Width = 100.0f, Height = 100.0f };
-    private static LineProfile LineProfile() => new LineProfile() { Axis = Vec2.UnitX, Length = 100.0f };
+    private static LineProfile LineProfile() => new LineProfile() { Axis = SysVec2.UnitX, Length = 100.0f };
     private static RingProfile RingProfile() => new RingProfile() { Radius = 100.0f };
-    private static SprayProfile SprayProfile() => new SprayProfile() { Direction = -Vec2.UnitY, Spread = MathF.PI / 2.0f };
+    private static SprayProfile SprayProfile() => new SprayProfile() { Direction = -SysVec2.UnitY, Spread = MathF.PI / 2.0f };
 }
