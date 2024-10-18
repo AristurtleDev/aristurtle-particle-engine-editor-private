@@ -12,6 +12,7 @@ public static class DockSpaceWindow
 
     private const ImGuiWindowFlags WINDOW_FLAGS = ImGuiWindowFlags.None |
                                                   ImGuiWindowFlags.NoTitleBar |
+                                                  ImGuiWindowFlags.NoBackground |
                                                   ImGuiWindowFlags.NoResize |
                                                   ImGuiWindowFlags.NoMove |
                                                   ImGuiWindowFlags.NoBringToFrontOnFocus |

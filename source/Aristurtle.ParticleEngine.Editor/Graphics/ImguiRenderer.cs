@@ -38,35 +38,45 @@ namespace Aristurtle.ParticleEngine.Editor.Graphics;
 /// <summary>
 /// ImGui renderer for use with XNA-likes (FNA & MonoGame)
 /// </summary>
-public class ImGuiRenderer
+public static class ImGuiRenderer
 {
-    private Game _game;
+    private static BasicEffect _effect;
+    private static RasterizerState _rasterizerState = new RasterizerState()
+    {
+        CullMode = CullMode.None,
+        DepthBias = 0,
+        FillMode = FillMode.Solid,
+        MultiSampleAntiAlias = false,
+        ScissorTestEnable = true,
+        SlopeScaleDepthBias = 0
+    };
 
-    // Graphics
-    private GraphicsDevice _graphicsDevice;
+    private static byte[] _vertexData;
+    private static VertexBuffer _vertexBuffer;
+    private static int _vertexBufferSize;
 
-    private BasicEffect _effect;
-    private RasterizerState _rasterizerState;
-
-    private byte[] _vertexData;
-    private VertexBuffer _vertexBuffer;
-    private int _vertexBufferSize;
-
-    private byte[] _indexData;
-    private IndexBuffer _indexBuffer;
-    private int _indexBufferSize;
+    private static byte[] _indexData;
+    private static IndexBuffer _indexBuffer;
+    private static int _indexBufferSize;
 
     // Textures
-    private Dictionary<nint, Texture2D> _loadedTextures;
+    private static Dictionary<nint, Texture2D> _loadedTextures = new Dictionary<nint, Texture2D>();
 
-    private int _textureId;
-    private nint? _fontTextureId;
+    private static int _textureId;
+    private static nint? _fontTextureId;
 
     // Input
-    private int _scrollWheelValue;
-    private int _horizontalScrollWheelValue;
-    private readonly float WHEEL_DELTA = 120;
-    private Keys[] _allKeys = Enum.GetValues<Keys>();
+    private static int _scrollWheelValue;
+    private static int _horizontalScrollWheelValue;
+    private static readonly float WHEEL_DELTA = 120;
+    private static Keys[] _allKeys = Enum.GetValues<Keys>();
+
+    static ImGuiRenderer()
+    {
+        nint context = ImGui.CreateContext();
+        ImGui.SetCurrentContext(context);
+        SetupInput();
+    }
 
     public ImGuiRenderer(Game game)
     {
@@ -534,30 +544,15 @@ public class ImGuiRenderer
 
     #region Setup & Update
 
-    /// <summary>
-    /// Setup key input event handler.
-    /// </summary>
-    protected virtual void SetupInput()
+    private static void SetupInput()
     {
-        var io = ImGui.GetIO();
+        ImGuiIOPtr io = ImGui.GetIO();
 
-        // MonoGame-specific //////////////////////
-        _game.Window.TextInput += (s, a) =>
+        Game1.Window.TextInput += (sender, args) =>
         {
-            if (a.Character == '\t') return;
-            io.AddInputCharacter(a.Character);
+            if (args.Character == '\t') { return; }
+            io.AddInputCharacter(args.Character);
         };
-
-        ///////////////////////////////////////////
-
-        // FNA-specific ///////////////////////////
-        //TextInputEXT.TextInput += c =>
-        //{
-        //    if (c == '\t') return;
-
-        //    ImGui.GetIO().AddInputCharacter(c);
-        //};
-        ///////////////////////////////////////////
     }
 
     /// <summary>

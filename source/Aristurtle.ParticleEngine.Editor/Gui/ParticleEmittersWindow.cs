@@ -2,36 +2,24 @@
 // See LICENSE file in the project root for full license information.
 // License information can also be found at https://unlicense.org/.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Aristurtle.ParticleEngine.Data;
+using Aristurtle.ParticleEngine.Editor.Factories;
 using Aristurtle.ParticleEngine.Editor.Graphics;
+using Aristurtle.ParticleEngine.Profiles;
 using ImGuiNET;
 
 namespace Aristurtle.ParticleEngine.Editor.Gui;
 
 public static class ParticleEmittersWindow
 {
-    private static readonly string[] _renderingOrderNames;
-    private static readonly string[] _particleValueKindNames;
+    private static readonly string[] _renderingOrderNames = Enum.GetNames(typeof(ParticleRenderingOrder));
+    private static readonly string[] _particleValueKindNames = Enum.GetNames(typeof(ParticleValueKind));
+    private static readonly string[] _circleRadiationNames = Enum.GetNames(typeof(CircleRadiation));
 
-    private static SysVec2 _contentSize = SysVec2.Zero;
-    private static SysVec2 _buttonSize = SysVec2.Zero;
-    private static SysVec2 _listBoxSize = SysVec2.Zero;
+    public static SysVec2 WindowSize = SysVec2.Zero;
+    public static SysVec2 WindowPos = SysVec2.Zero;
 
-
-    static ParticleEmittersWindow()
-    {
-        _renderingOrderNames = Enum.GetNames(typeof(ParticleRenderingOrder));
-        _particleValueKindNames = Enum.GetNames(typeof(ParticleValueKind));
-    }
-
-
-    public static void Draw(ImGuiStylePtr style, ImGuiIOPtr io)
+    public static void Draw()
     {
         SysVec2 pos = new SysVec2(0, MainMenuWindow.Size.Y);
 
@@ -40,31 +28,38 @@ public static class ParticleEmittersWindow
         ImGui.SetNextWindowPos(pos, ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowSize(size, ImGuiCond.FirstUseEver);
         ImGui.Begin("Particle Emitters");
-
-        DrawEmitterList(style, io);
+        DrawEmitterList();
         DrawSelectedEmitterInputs();
 
-        //  TODO: Selected Emitter Profile
+        WindowSize = ImGui.GetWindowSize();
+        WindowPos = ImGui.GetWindowPos();
 
         ImGui.End();
     }
 
-    private static void DrawEmitterList(ImGuiStylePtr style, ImGuiIOPtr io)
+    private static void DrawEmitterList()
     {
-        _contentSize = ImGui.GetContentRegionAvail();
-        _buttonSize.X = _contentSize.X * 0.5f - style.ItemSpacing.X * 0.5f;
+        ImGuiStylePtr style = ImGui.GetStyle();
 
-        if (ImGui.Button("Add Emitter", _buttonSize)) { Project.AddNewEmitter(); }
+        SysVec2 contentSize = ImGui.GetContentRegionAvail();
+
+        SysVec2 buttonSize;
+        buttonSize.X = contentSize.X * 0.5f - style.ItemSpacing.X * 0.5f;
+        buttonSize.Y = 0;
+
+        SysVec2 listBoxSize;
+        listBoxSize.X = contentSize.X;
+        listBoxSize.Y = ImGui.CalcTextSize("Y").Y * 5 + style.ItemSpacing.Y * 5;
+
+
+        if (ImGui.Button("Add Emitter", buttonSize)) { Project.AddNewEmitter(); }
         ImGui.SameLine();
         ImGui.BeginDisabled(Project.ParticleEffect is null || Project.ParticleEffect.Emitters.Count == 0);
-        if (ImGui.Button("Remove Emitter", _buttonSize)) { Project.RemoveSelectedEmitter(); }
+        if (ImGui.Button("Remove Emitter", buttonSize)) { Project.RemoveSelectedEmitter(); }
         ImGui.EndDisabled();
 
-        _listBoxSize = ImGui.GetContentRegionAvail();
-        _listBoxSize.Y = ImGui.CalcTextSize("Y").Y * 5 + style.ItemSpacing.Y * 5;
-
         ImGui.BeginDisabled(Project.ParticleEffect is null || Project.ParticleEffect.Emitters.Count == 0);
-        if (ImGui.BeginListBox("##Particle Emitters ListBox", _listBoxSize))
+        if (ImGui.BeginListBox("##Particle Emitters ListBox", listBoxSize))
         {
             for (int i = 0; i < Project.ParticleEffect.Emitters.Count; i++)
             {
@@ -92,6 +87,7 @@ public static class ParticleEmittersWindow
 
         DrawSelectedEmitterProperties();
         DrawSelectedEmitterParameters();
+        DrawSelectedEmitterProfile();
     }
 
     #region Selected Emitter Properties
@@ -360,7 +356,7 @@ public static class ParticleEmittersWindow
             ImGui.TableNextColumn();
             ImGui.TableNextColumn();
             ImGui.SetNextItemWidth(-1);
-            if(ImGui.ColorEdit3("##Selected Emitter Color Random Max Input", ref rgbMax, ImGuiColorEditFlags.InputRGB))
+            if (ImGui.ColorEdit3("##Selected Emitter Color Random Max Input", ref rgbMax, ImGuiColorEditFlags.InputRGB))
             {
                 var (h, s, l) = ColorUtilities.RgbToHsl(rgbMax);
                 value.RandomMax = new SysVec3(h, s, l);
@@ -523,4 +519,225 @@ public static class ParticleEmittersWindow
 
     #endregion Selected Emitter Parameters
 
+    #region Selected Emitter Profile
+
+    private static void DrawSelectedEmitterProfile()
+    {
+        ImGui.BeginTable("##Selected Emitter Profile Table", 3, ImGuiTableFlags.SizingStretchSame);
+        DrawSelectedEmitterProfileTypeInput();
+
+        switch (Project.SelectedEmitter.Profile)
+        {
+            case BoxFillProfile boxFillProfile:
+                DrawSelectedEmitterProfileInputs(boxFillProfile);
+                break;
+
+            case BoxProfile boxProfile:
+                DrawSelectedEmitterProfileInputs(boxProfile);
+                break;
+
+            case BoxUniformProfile boxUniformProfile:
+                DrawSelectedEmitterProfileInputs(boxUniformProfile);
+                break;
+
+            case CircleProfile circleProfile:
+                DrawSelectedEmitterProfileInputs(circleProfile);
+                break;
+
+            case LineProfile lineProfile:
+                DrawSelectedEmitterProfileInputs(lineProfile);
+                break;
+
+            case RingProfile ringProfile:
+                DrawSelectedEmitterProfileInputs(ringProfile);
+                break;
+
+            case SprayProfile sprayProfile:
+                DrawSelectedEmitterProfileInputs(sprayProfile);
+                break;
+
+
+        }
+
+        ImGui.EndTable();
+    }
+
+    private static void DrawSelectedEmitterProfileTypeInput()
+    {
+        int index = Array.IndexOf(ParticleProfileFactory.ProfileTypes, Project.SelectedEmitter.Profile.GetType());
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.Text("Profile Type");
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        if (ImGui.Combo("##Selected Emitter Profile Type Input", ref index, ParticleProfileFactory.ProfileTypeNames, ParticleProfileFactory.ProfileTypeNames.Length))
+        {
+            Type newType = ParticleProfileFactory.ProfileTypes[index];
+            if (Project.SelectedEmitter.Profile.GetType() != newType)
+            {
+                Project.SelectedEmitter.Profile = ParticleProfileFactory.CreateProfile(newType);
+            }
+        }
+    }
+
+    private static void DrawSelectedEmitterProfileInputs(BoxFillProfile profile)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Width");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Box Fill Profile Width Input", ref profile.Width, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Height");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Box Fill Profile Height Input", ref profile.Height, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+    }
+
+    private static void DrawSelectedEmitterProfileInputs(BoxProfile profile)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Width");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Box Profile Width Input", ref profile.Width, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Height");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Box Profile Height Input", ref profile.Height, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+    }
+
+    private static void DrawSelectedEmitterProfileInputs(BoxUniformProfile profile)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Width");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Box Uniform Profile Width Input", ref profile.Width, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Height");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Box Uniform Profile Height Input", ref profile.Height, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+    }
+
+    private static void DrawSelectedEmitterProfileInputs(CircleProfile profile)
+    {
+        int radiate = (int)profile.Radiate;
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Radiate");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        if (ImGui.Combo("##Selected Emitter Circle Profile Radiate Input", ref radiate, _circleRadiationNames, _circleRadiationNames.Length))
+        {
+            profile.Radiate = (CircleRadiation)radiate;
+        }
+        ImGuiEx.OutlinePreviousItemIfActive();
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Radius");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Circle Profile Radius Input", ref profile.Radius, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+    }
+
+    private static void DrawSelectedEmitterProfileInputs(LineProfile profile)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Axis");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat2("##Selected Emitter Line Profile Axis Input", ref profile.Axis, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Length");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Line Profile Length Input", ref profile.Length, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+    }
+
+    private static void DrawSelectedEmitterProfileInputs(RingProfile profile)
+    {
+        int radiate = (int)profile.Radiate;
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Radiate");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        if (ImGui.Combo("##Selected Emitter Ring Profile Radiate Input", ref radiate, _circleRadiationNames, _circleRadiationNames.Length))
+        {
+            profile.Radiate = (CircleRadiation)radiate;
+        }
+        ImGuiEx.OutlinePreviousItemIfActive();
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Radius");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Ring Profile Radius Input", ref profile.Radius, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+    }
+
+    private static void DrawSelectedEmitterProfileInputs(SprayProfile profile)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Direction");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat2("##Selected Emitter Spray Profile Axis Input", ref profile.Direction, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TableNextColumn();
+        ImGui.Text("Spread");
+        ImGui.TableNextColumn();
+        ImGui.SetNextItemWidth(-1);
+        ImGui.InputFloat("##Selected Emitter Spray Profile Spread Input", ref profile.Spread, 0, 0, null, ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGuiEx.OutlinePreviousItemIfActive();
+    }
+
+    #endregion Selected Emitter Profile
 }

@@ -120,7 +120,7 @@ public static class Project
         ParticleEffect.Emitters.Add(SelectedEmitter);
     }
 
-    private static void RemoveSelectedEmitter()
+    public static void RemoveSelectedEmitter()
     {
         if (ParticleEffect is null || SelectedEmitter is null) { return; }
 
@@ -187,5 +187,48 @@ public static class Project
         CurrentInterpolators.RemoveAt(index);
         index = Math.Max(0, index - 1);
         SelectedInterpolator = CurrentInterpolators.ElementAtOrDefault(index);
+    }
+
+    public static void AddNewTexture()
+    {
+        if (SelectedEmitter is null) { return; }
+
+        string result = TinyFileDialog.OpenFile("Choose Texture", DefaultDirectory, "*.png,*.jpg,*.tif", "Image Files", false);
+
+        if (string.IsNullOrEmpty(result)) { return; }
+
+        string textureKey = Path.GetFileName(result);
+
+        //  If the image file they choose is already in the project directory, check to see if it's already loaded.
+        //  If not already loaded, load it first, then set the texture key of the selected emitter to that texture.
+        if(Path.GetDirectoryName(result).Equals(ProjectDirectory, StringComparison.OrdinalIgnoreCase))
+        {
+            if(!ParticleEffectRenderer.Textures.ContainsKey(textureKey))
+            {
+                Texture2D texture = Texture2D.FromFile(Game1.GraphicsDevice, result);
+                texture.Name = textureKey;
+                ParticleEffectRenderer.Textures.Add(textureKey, texture);
+            }
+
+            SelectedEmitter.TextureKey = textureKey;
+            return;
+        }
+
+        //  If they image file they choose is not in the project directory, this means we'll need to copy it to the
+        //  project directory.  However, if a file already exists in the project directory with that name, we'll need
+        //  to prompt for approval to overwrite it
+        string existing = Path.Combine(ProjectDirectory, textureKey);
+        if(File.Exists(existing))
+        {
+            string choice = TinyFileDialog.MessageBox("Overwrite Existing?", $"{existing} already exists.\nDo you want to replace it?", "yesno", "warning", 0);
+            if (choice == "no") { return; }
+            ParticleEffectRenderer.Textures[textureKey].Dispose();
+            ParticleEffectRenderer.Textures.Remove(textureKey);
+        }
+
+        File.Copy(result, existing, true);
+        Texture2D newTexture = Texture2D.FromFile(Game1.GraphicsDevice, existing);
+        ParticleEffectRenderer.Textures.Add(textureKey, newTexture);
+        SelectedEmitter.TextureKey = textureKey;
     }
 }
