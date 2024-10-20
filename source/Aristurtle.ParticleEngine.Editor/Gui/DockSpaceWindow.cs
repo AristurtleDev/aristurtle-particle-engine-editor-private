@@ -25,6 +25,22 @@ public static class DockSpaceWindow
 
     public static void Draw()
     {
+        //---------------------------------------------------------------------------------------------------------------------
+        //  Not drawing the docking space window at the moment, as it's causing random crashes that I'm not able to figure out.
+        //  If you would like to contribute and figure it out be my guest.  To recreate a crash, do the following
+        //
+        //  1. Remove the return statement below
+        //  2. Run the application
+        //  3. Dock the emitter window
+        //  4. Dock the modifier window inside the emitter window at the top so it creates tabs
+        //  5. Add a new emitter
+        //  6. Click the modifier window tab
+        //
+        //  at that point, the crash will happen due to something with the table draws, but the exception for for invalid
+        //  memory access.  I don't know, until it's figured out, docking is disabled.
+        //---------------------------------------------------------------------------------------------------------------------
+        return;
+
         SysVec2 pos = new SysVec2(0, MainMenuWindow.Size.Y);
 
         SysVec2 size = ImGui.GetIO().DisplaySize;

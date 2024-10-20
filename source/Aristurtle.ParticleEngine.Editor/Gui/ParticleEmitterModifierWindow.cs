@@ -12,8 +12,10 @@ namespace Aristurtle.ParticleEngine.Editor.Gui;
 
 public static class ParticleEmitterModifierWindow
 {
+    public static bool IsModalOpen = false;
     public static SysVec2 WindowSize = SysVec2.Zero;
     public static SysVec2 WindowPos = SysVec2.Zero;
+    public static XnaRect Bounds => new XnaRect((int)WindowPos.X, (int)WindowPos.Y, (int)WindowSize.X, (int)WindowSize.Y);
 
     public static void Draw()
     {
@@ -89,7 +91,6 @@ public static class ParticleEmitterModifierWindow
     private static void DrawChooseModifierModal()
     {
         bool isOpen = true;
-
         if (ImGui.BeginPopupModal("Choose Modifier Modal", ref isOpen, ImGuiWindowFlags.AlwaysAutoResize))
         {
             for (int i = 0; i < ModifierFactory.ModifierTypeNames.Length; i++)
@@ -107,6 +108,8 @@ public static class ParticleEmitterModifierWindow
             ImGui.SetWindowPos(pos);
             ImGui.EndPopup();
         }
+
+        IsModalOpen = isOpen;
     }
 
     private static void DrawSelectedModifierInputs()
@@ -462,6 +465,8 @@ public static class ParticleEmitterModifierWindow
             ImGui.SetWindowPos(pos);
             ImGui.EndPopup();
         }
+
+        IsModalOpen = isOpen;
     }
 
     private static void DrawSelectedInterpolatorInputs()

@@ -1,22 +1,14 @@
-## Aristurtle Particle Engine
-A C# 2D particle engine based on [Mercury Particle Engine](https://github.com/Matthew-Davey/mercury-particle-engine).
+<h1 align="center">
+Aristurtle Particle Engine Editor
 
-Current Version 1.0.0
+<img src="https://raw.githubusercontent.com/AristurtleDev/aristurtle-particle-engine-editor/main/.images/preview.gif" alt="Aristurtle Particle Engine Editor Preview">
+<br/>
 
-## Usage
-> [!CAUTION]
-> At this time, there is not a NuGet package offering.  Users are encouraged to use from source, enabling them to make changes as needed to fit their project as well as contribute back where applicable.
+An editor to create particle effects for use with [Aristurtle Particle Engine](https://github.com/aristurtle/aristurtle-particle-engine)
 
-1. Clone repository
+[![License: MIT](https://img.shields.io/badge/📃%20license-MIT-blue?style=flat)](LICENSE)
 
-```sh
-git clone https://github.com/AristurtleDev/aristurtle-particle-engine.git
-```
-
-2. Add the **Aristrutle.ParticleEngine.csproj** to your current solution (.sln) file
-3. Add a reference to **Aristurtle.ParticleEngine.csproj** to your csproj file.
-
-For examples on how to use, please refer to the [samples](/samples) directory.
+</h1>
 
 ## License
-**Aristurtle Particle Engine** is free and unencumbered public domain software, licensed under The Unlicense.  See the [LICENSE](LICENSE) file for more information.
+**Aristurtle Particle Engine Editor** is licensed under the MIT License.  See the [LICENSE](LICENSE) file for full license text.

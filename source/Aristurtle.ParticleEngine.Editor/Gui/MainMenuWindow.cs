@@ -2,13 +2,7 @@
 // See LICENSE file in the project root for full license information.
 // License information can also be found at https://unlicense.org/.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImGuiNET;
-using Microsoft.Xna.Framework;
 
 namespace Aristurtle.ParticleEngine.Editor.Gui;
 

@@ -34,16 +34,16 @@ public static class StartWindow
 
         ImGui.Begin($"##{ID}", WINDOW_FLAGS);
 
-        ImGui.PushFont(Fonts.TitleFont);
+        //ImGui.PushFont(Fonts.TitleFont);
         ImGui.Text("Turtle Particle Engine");
-        ImGui.PopFont();
+        //ImGui.PopFont();
 
         SysVec2 buttonSize = new SysVec2(400, 100);
         SysVec2 topLeft;
         topLeft.X = halfDisplaySize.X - buttonSize.X * 0.5f;
         topLeft.Y = halfDisplaySize.Y - (buttonSize.Y * 2 + style.ItemSpacing.Y) * 0.5f;
 
-        ImGui.PushFont(Fonts.HeadingFont);
+        //ImGui.PushFont(Fonts.HeadingFont);
         ImGui.SetCursorPos(topLeft);
 
         if (ImGui.Button("Create new Project##Button", buttonSize)) { Project.CreateNew(); }
@@ -52,7 +52,7 @@ public static class StartWindow
 
         if (ImGui.Button("Open Existing Project##Button", buttonSize)) { Project.OpenExisting(); }
 
-        ImGui.PopFont();
+        //ImGui.PopFont();
 
         ImGui.End();
 

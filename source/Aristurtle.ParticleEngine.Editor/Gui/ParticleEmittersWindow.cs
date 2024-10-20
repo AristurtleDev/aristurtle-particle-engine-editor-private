@@ -18,6 +18,7 @@ public static class ParticleEmittersWindow
 
     public static SysVec2 WindowSize = SysVec2.Zero;
     public static SysVec2 WindowPos = SysVec2.Zero;
+    public static XnaRect Bounds => new XnaRect((int)WindowPos.X, (int)WindowPos.Y, (int)WindowSize.X, (int)WindowSize.Y);
 
     public static void Draw()
     {
